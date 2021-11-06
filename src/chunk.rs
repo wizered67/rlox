@@ -4,6 +4,11 @@ use num_derive::FromPrimitive;
 #[derive(Debug, FromPrimitive)]
 pub enum Opcode {
   Constant,
+  Add,
+  Subtract,
+  Multiply,
+  Divide,
+  Negate,
   Return,
 }
 
@@ -14,8 +19,8 @@ impl Opcode {
 }
 
 pub struct Chunk {
-  code: Vec<u8>,
-  constants: Vec<value::Value>,
+  pub code: Vec<u8>,
+  pub constants: Vec<value::Value>,
   lines: Vec<i32>,
 }
 
@@ -42,7 +47,7 @@ impl Chunk {
       offset = self.disassemble_instruction(offset);
     }
   }
-  fn disassemble_instruction(&self, offset: usize) -> usize {
+  pub fn disassemble_instruction(&self, offset: usize) -> usize {
     print!("{:04} ", offset);
     if offset > 0 && self.lines[offset] == self.lines[offset - 1] {
       print!("   | ");
@@ -58,6 +63,21 @@ impl Chunk {
       }
       Some(Opcode::Constant) => {
         return self.constant_instruction("OP_CONSTANT", offset);
+      }
+      Some(Opcode::Add) => {
+        return simple_instruction("OP_ADD", offset);
+      }
+      Some(Opcode::Subtract) => {
+        return simple_instruction("OP_SUBTRACT", offset);
+      }
+      Some(Opcode::Multiply) => {
+        return simple_instruction("OP_MULTIPLY", offset);
+      }
+      Some(Opcode::Divide) => {
+        return simple_instruction("OP_DIVIDE", offset);
+      }
+      Some(Opcode::Negate) => {
+        return simple_instruction("OP_NEGATE", offset);
       }
       None => {
         println!("Unknown opcode {}", raw_value);
